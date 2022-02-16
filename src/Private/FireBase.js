@@ -111,23 +111,13 @@ export function useVerlistadoequipos(coleccion) {
 
   console.log("Ingreso al servidor para pedir lista de equipos")
   
-
-  /*const unsubscribe = onSnapshot(collection(db, "cities"), () => {
-    // Respond to data
-    // ...
-  });*/
-  
-  
   useEffect(()=>{
     
-    
+    //funcion real time
     onSnapshot(query(collection(db, coleccion)), (snapshot) => {
-        
-        
-      setListaquipos(snapshot.docs.map((item)=>({... item.data(), id: doc.id})))
-      
-      /*let listado =[];
-        
+        //ingresa cada ves que hay un cambio
+        let listado =[];
+        //hace for each para ordenar la lista
         snapshot.forEach((item)=>{
         
             let objeto = []
@@ -148,12 +138,13 @@ export function useVerlistadoequipos(coleccion) {
             listado.push(objeto);
             
         })
-
+        //si la lista que trajo es igual de largo que el estado entonces la cambia 
+        //si no no se hace render y espera al proximo llamado
       if(listadoequipos.length !== listado.length){
-        unsubscribe();
+      
         setListaquipos(listado)
       }
-      */
+      
     
     
     });
