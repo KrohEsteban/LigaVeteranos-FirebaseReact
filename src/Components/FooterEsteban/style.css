@@ -1,0 +1,41 @@
+/* footer */
+
+
+.footnav{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    background-color: black;
+    width: 100%;
+    padding: 20px;
+    
+    
+  }
+  
+  .footnav p{
+    color: white;
+    font-size: 1.3em;
+    align-self: center;
+  }
+  
+  .footnav a{ 
+    color: white;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6em;
+    text-decoration: none;
+  }
+  
+  @media (max-width: 500px){
+    .footnav p{
+        width: 350px;
+    }
+  }
+
+  @media (max-width: 325px){
+    .footnav p{
+        font-size: 1.2em;
+    }
+    .footnav a{ 
+        font-size: 1.5em;
+    }
+  }
