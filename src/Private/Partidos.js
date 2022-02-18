@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Table} from "react-bootstrap";
-import { verlistadoequipos } from "./FireBase";
 import InputSpinner from 'react-bootstrap-input-spinner' 
 
 

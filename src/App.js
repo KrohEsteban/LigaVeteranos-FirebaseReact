@@ -17,7 +17,7 @@ export default function App() {
         <React.StrictMode>
             <BrowserRouter >
                 <Routes>
-                    <Route path="/senior" element={<Senior />} />
+                    <Route path="/senior" element={<Senior />} /> 
                     <Route path="/libre" element={<Libre />} />
                     <Route path="/maxi" element={<Maxi />} />
                     <Route path="/master" element={<Master />} />

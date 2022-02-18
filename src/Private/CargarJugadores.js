@@ -1,10 +1,7 @@
-import React, {  useEffect, useState } from "react";
-import { Container, Accordion} from 'react-bootstrap';
-import FooterEsteban from "../Components/FooterEsteban/FooterEsteban.js";
-import MenuPrivado from "../Components/MenuPrivado.js";
+import React, { useState } from "react";
 import { Alert, Button, Form, Table } from "react-bootstrap";
-import { nuevoequipo, nuevojugador, useVerlistadojugadores, verlistadoequipos, verlistadojugadores} from "./FireBase.js";
-import CargarEquipos from "./CargarEquipos.js";
+import {nuevojugador} from "./FireBase.js";
+import { validarapellido, validardocumento, validarequipo, validarnombre } from "../Components/Validadores.js";
 
 
 
@@ -16,12 +13,7 @@ export default function  CargarJugadores(props) {
         documento:"",
         equipo:"",
     });
-
-    const listajugadores= useVerlistadojugadores("jugadores");
-   
-    const [campoequipo, setCampoequipo]= useState()
-
-    const [campocategoria, setCampocategoria]= useState()
+    // estado para mostrar el texto al validar los campos en el onblur
 
     const [camponombrejugador, setCamponombrejugador]= useState("")   
 
@@ -30,15 +22,16 @@ export default function  CargarJugadores(props) {
     const [campodocumentojugador, setCampodocumentojugador]= useState("")
 
     const [campoequipojugador, setCampoequipojugador]= useState("")
-    
-    const [jugadoresdeequipo, setJugadoresdeequipo]= useState();
-    
-    const [listaequipos, setListaequipos]= useState("");
-    
-    const [registroequipos, setRegistroequipos]= useState("");
 
+    //almasena el equipo del que se quiere mostrar la lista de jugadores
+
+    const [jugadoresdeequipo, setJugadoresdeequipo]= useState();
+
+    // estado para mostrar el mensaje de alerta si no se almasena el jugador en el servidor
     const [registrojugadores, setRegistrojugadores]= useState("");
-    
+
+
+
     const handleChangejugadores = (event) => {
    
         let valor= event.target.value.charAt(0).toUpperCase() + event.target.value.slice(1).toLowerCase();
@@ -55,9 +48,20 @@ export default function  CargarJugadores(props) {
 
         e.preventDefault()
 
-        if ((camponombrejugador==="") && (campoapellidojugador==="") && (campodocumentojugador==="") && (campoequipojugador===""))
+
+        // vuelve a validar los datos xq el on blur no detecta cuando presionas enter
+        const validacionnombre=validarnombre(jugador.nombre)
+        setCamponombrejugador(validacionnombre)
+        const validacionapellido=validarapellido(jugador.apellido)
+        setCampoapellidojugador(validacionapellido)
+        const validaciondocumento=validardocumento(jugador.documento)
+        setCampodocumentojugador(validaciondocumento)
+        const validacionequipo=validarequipo(jugador.equipo)
+        setCampoequipojugador(validacionequipo)
+
+        if ((validacionnombre==="") && (validacionapellido==="") && (validaciondocumento==="") && (validacionequipo===""))
         {
-            setRegistrojugadores(await nuevojugador(jugador.nombre, jugador.apellido, jugador.documento, jugador.equipo, listajugadores));
+            setRegistrojugadores(await nuevojugador(jugador.nombre, jugador.apellido, jugador.documento, jugador.equipo, props.listajugadores));
 
         }else{
             setRegistrojugadores("Deve ingresar los datos correctamente")
@@ -65,6 +69,8 @@ export default function  CargarJugadores(props) {
 
     }
 
+
+    // evento para detectar el equipo del cual queremos ver la lista de jugadores
     const equipoaver = (event) =>{
 
           
@@ -72,6 +78,7 @@ export default function  CargarJugadores(props) {
      
     }
 
+    //muestra la lista de jugadores
 
     const tablajugadores = ()=>{
 
@@ -79,9 +86,9 @@ export default function  CargarJugadores(props) {
        
         if (jugadoresdeequipo!==""){
             
-            if(listajugadores !== ""){
+            if(props.listajugadores !== ""){
     
-                    listajugadores.map((item)=>{
+                    props.listajugadores.forEach((item)=>{
                         let objeto=[];
                         if(item.equipo===jugadoresdeequipo){
                             
@@ -119,22 +126,8 @@ export default function  CargarJugadores(props) {
             
     }
 
-    const tablaequipos= ()=>{
-        if(listaequipos !== ""){
 
-            
-            return(listaequipos.map((item)=>
-                <tr key={item.id}>
-            
-                    <td >{item.nombre}</td>
-                    <td >{item.categoria}</td>
-                    
-                </tr>
-                
-            ))}
-            
-    }
-
+    //muestra la lista e equipos para las opciones del select
     const listaselectequipos= ()=>{
         if(props.listaequipos !== ""){
 
@@ -147,10 +140,12 @@ export default function  CargarJugadores(props) {
             
     }
 
-    
+    // alerta del registro de equipos
     function alertajugadores(){
         if(registrojugadores!=="")
         {   
+            setTimeout(()=>{setRegistrojugadores("")},3000) 
+            
             if(registrojugadores==="El jugador se registro con exito"){
                 return(
                 <Alert variant="success"> {registrojugadores} </Alert>
@@ -183,6 +178,7 @@ return (
                                 name="nombre" 
                                 type="text" 
                                 placeholder="Jugador"
+                                onBlur={()=>setCamponombrejugador( validarnombre(jugador.nombre)) }
                                 
                             />
                             <p className="text-danger">  {camponombrejugador}</p>
@@ -195,6 +191,7 @@ return (
                                 name="apellido" 
                                 type="text" 
                                 placeholder="Apellido" 
+                                onBlur={()=>setCampoapellidojugador( validarapellido(jugador.apellido)) }
                                
                             />
                             <p className="text-danger">  {campoapellidojugador}</p>
@@ -207,6 +204,7 @@ return (
                                 name="documento" 
                                 type="text" 
                                 placeholder="Documento" 
+                                onBlur={()=>setCampodocumentojugador( validardocumento(jugador.documento)) }
                             
                             />
                             <p className="text-danger">  {campodocumentojugador}</p>
@@ -215,11 +213,11 @@ return (
                             <Form.Label>Elegir Equipo</Form.Label>
                                 <Form.Select 
                                 aria-label="Default select example" 
-                                onClick={handleChangejugadores} 
+                                onChange={handleChangejugadores} 
                                 name="equipo" 
-                                
+                                onClick={()=>setCampoequipojugador( validarequipo(jugador.equipo))}
                                 >
-                                <option >Seleccione una opcion:</option>
+                                <option value="Elegir">Seleccione una opcion:</option>
                                 {listaselectequipos()}
                                 </Form.Select>
                                 <p className="text-danger">  {campoequipojugador}</p>

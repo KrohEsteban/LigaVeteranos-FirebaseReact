@@ -1,33 +1,77 @@
- /*onBlur={(e)=>{
-                    
-                    let regex = /^[a-zA-Z ]{1,40}$/;
 
-                    setCampoequipo("");
+export function validarnombre(dato){
 
-                    if(equipo.nombre!==""){
+    const expresionregular = /^[a-zA-Z ]{1,40}$/;
 
-                        if ( !regex.test(equipo.nombre)) { 
-                                setCampoequipo("Solo se aceptan letras.")     
-                            }     
-                    }
-                    
-                }}
-            />
-            <p className="text-danger">  {campoequipo}</p>*/
+        if(dato!==""){
+
+            if ( !expresionregular.test(dato)) { 
+                return "Debe poner un nombre válido."    
+            }else{
+                return ""
+            }
+
+        }else{
+            return ""
+        }
+    
+}
+
+export function validarapellido(dato){
+
+    const expresionregular = /^[a-zA-Z ]{1,40}$/;
+
+        if(dato!==""){
+
+            if ( !expresionregular.test(dato)) { 
+                return "Debe poner un apellido válido."    
+            }else{
+                return ""
+            }
+
+        }else{
+            return ""
+        }
+    
+}
 
 
+export function validarcategoria(dato){
 
-            /*onBlur={(e)=>{
+        if((dato==="Maxi")||(dato==="Senior")||(dato==="Libre")||(dato==="Master")){
+            return "" 
+        }else{
+            return "Debe poner una categoría válida."
+        }
+ 
+}
 
-                    setCampocategoria("");
 
-                    if(equipo.categoria!==""){
+export function validardocumento(dato){
 
-                        if ( (equipo.categoria!=="Libre") && (equipo.categoria!=="Maxi") && (equipo.categoria!=="Master") && (equipo.categoria!=="Senior")) { 
-                                setCampocategoria("Las categorias son: Libre, Maxi, Master o Senior.")     
-                            }     
-                    }
-                    
-                }}
-            />
-            <p className="text-danger">  {campocategoria}</p>*/
+    const expresionregular = /^[0-9 ]{7,8}$/;
+
+        if(dato!==""){
+
+            if ( !expresionregular.test(dato)) { 
+                return "Debe poner un dni válido."    
+            }else{
+                return ""
+            }
+
+        }else{
+            return ""
+        }
+    
+}
+
+export function validarequipo(dato){
+
+    if(dato==="Elegir"){
+        return "Debe elegir una opción" 
+    }else{
+        return ""
+    }
+
+}
+

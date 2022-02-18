@@ -1,14 +1,16 @@
-import React, {  useEffect, useState } from "react";
-import { Container, Accordion} from 'react-bootstrap';
-import FooterEsteban from "../Components/FooterEsteban/FooterEsteban.js";
-import MenuPrivado from "../Components/MenuPrivado.js";
+import React, { useState } from "react";
 import { Alert, Button, Form, Table } from "react-bootstrap";
-import { nuevoequipo, nuevojugador, verlistadoequipos, verlistadojugadores} from "./FireBase.js";
+import { nuevoequipo} from "./FireBase.js";
+import {validarcategoria, validarnombre} from "../Components/Validadores.js";
 
 
 export default function  CargarEquipos(props) {
-
+    // muestra un alerta si hay algun error en el servidor como un jugador ya cargado
     const [registroequipos, setRegistroequipos]= useState("");
+    
+    // estados para validar los campos 
+    const [camponombre, setCamponombre] = useState("")
+    const [campocategoria, setCampocategoria] = useState("")
 
     const [equipo, setEquipo] = useState({
         nombre: "",
@@ -28,8 +30,14 @@ export default function  CargarEquipos(props) {
     const handleSubmitequipos = async (e)=>{
 
         e.preventDefault()
+
+        //Valida nuevamente los campos antes de enviarlos al servidor (el onblure no detecta si apretas enter)
+        const validacionnombre=validarnombre(equipo.nombre)
+        setCamponombre(validacionnombre)
+        const validacioncategoria=validarcategoria(equipo.categoria)
+        setCampocategoria(validacioncategoria)
         
-        if (true)
+        if ((validacionnombre==="") && (validacioncategoria===""))
         {
             setRegistroequipos(await nuevoequipo(equipo.categoria, equipo.nombre, props.listaequipos));
 
@@ -40,7 +48,7 @@ export default function  CargarEquipos(props) {
        
     }
 
-
+    // muestra la tabla de equipos
     const tablaequipos= ()=>{
         
         if(props.listaequipos !== ""){
@@ -58,9 +66,12 @@ export default function  CargarEquipos(props) {
             
     }
 
+    //muestra el alert del registro de equipos
     function alertaequipos(){
         if(registroequipos!=="")
         {   
+            setTimeout(()=>{setRegistroequipos("")},3000) 
+
             if(registroequipos==="El equipo se registro con exito"){
                 return(
                 <Alert variant="success"> {registroequipos} </Alert>
@@ -87,13 +98,21 @@ export default function  CargarEquipos(props) {
         <Form onSubmit={handleSubmitequipos}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Ingrese el nombre del Equipo</Form.Label>
-            <Form.Control onChange={handleChangeequipos} name="nombre" type="text" placeholder="Equipo" />
+            <Form.Control onChange={handleChangeequipos} name="nombre" type="text" placeholder="Equipo" 
+            onBlur={()=>setCamponombre(validarnombre(equipo.nombre))}/>
+            <p className="text-danger">{camponombre}</p>
         </Form.Group>
-
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>Ingrese la categoría</Form.Label>
-            <Form.Control onChange={handleChangeequipos} name="categoria" type="text" placeholder="Categoría"/>
-        </Form.Group>
+        <Form.Label >Ingrese la categoria:</Form.Label>
+            <Form.Select aria-label="Default select example" onChange={handleChangeequipos} name="categoria" 
+            onClick={()=>setCampocategoria(validarcategoria(equipo.categoria))}>
+            <option value="Elegir"> Seleccione una opcion: </option>
+            <option value="Senior" > Senior </option>
+            <option value="Maxi"> Maxi </option>
+            <option value="Master"> Master </option>
+            <option value="Libre"> Libre </option>
+            
+            </Form.Select>
+            <p className="text-danger">{campocategoria}</p>
 
         <Button variant="primary" type="submit">
             Enviar

@@ -32,7 +32,13 @@ export default function Login() {
        
         const sesion = await login(user.username, user.password); 
 
-        sesion ? navegar('/privada') : alert("Error pruebe de nuevo");
+        if ((sesion === 1) || (sesion === 2)){
+            navegar('/privada')
+        }else if (sesion === 3){
+            alert ("El usuario esta desabilitado")
+        }else{
+            alert("Error pruebe de nuevo o consulte con el técnico");
+        }   
     
     }
 

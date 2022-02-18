@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Login log out
+// import gestion usuario
 
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut} from "firebase/auth";
 
 
 // import base de datos
-import { getFirestore, setDoc, doc, getDocs, collection, onSnapshot, query} from "firebase/firestore";
+import { getFirestore, setDoc, doc, collection, onSnapshot, query, getDoc} from "firebase/firestore";
 
 
 // generar id automatico
@@ -28,26 +28,50 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+
 initializeApp(firebaseConfig);
-const  auth = getAuth();
-const db = getFirestore();
+const  auth = getAuth(); // usuario
+const db = getFirestore(); // base de datos
 
 // iniciar sesion
-
+/*
+devuelve 0 si hay un error, 1 si puede ingresar cualquier usuario y 
+2 si el usuario de agragar equipo esta HABILITADO
+3 si el usuario de agregar equipo esta DESABILITADO 
+*/ 
 export async function login(username, password){
   
-  let token = false;
+  let token = 0;
   
-  await signInWithEmailAndPassword(auth, username, password)
+  const docRef = doc(db, "usuario", "YEfWLF5SQjMkaXT6RoCO"); //revisa si esta habilitado el usuario de agregar equipos
+  
+  const docSnap = await getDoc(docRef);
+  
+  await signInWithEmailAndPassword(auth, username, password) //revisa si el usuario es correcto
   .then(() => {
       // Signed in
-      token=true;
+      token=1;
+      
+      
+      
+      if (docSnap.exists()) {
+        if (docSnap.data().usuarioequipos){
+          token = 2;
+        }else{
+          token = 3;
+        }
+      } else {
+        
+        token=0;
+      }
       // ...
   })
   .catch((error) => {
-      token=false;
+      token=0;
   
   });
+
+  
 
   return token;
 
@@ -68,6 +92,9 @@ export async function salir(){
 }
 
 //esta logeado?
+/*
+  Detecta el login y si esun usuario o otro para mostrar diferentes paginas
+*/
 export function useLogeado() {
 
   const [token, setToken] = useState(0);
@@ -145,9 +172,6 @@ export function useVerlistadoequipos(coleccion) {
 
   });
   
-    
-      
-   
   return listadoequipos ;
 }
 
@@ -209,16 +233,17 @@ export function useVerlistadojugadores(coleccion) {
 export async function nuevoequipo(categoria, nombre, lista) {
 
   let texto;
-  let equipoid = uuidv4();
+  let equipoid = uuidv4(); //elige un uid automatico 
   let validador = true;
 
+  // detecta si el equipo ya esta en la lista por el nombre
   lista.forEach((item)=>{
   
     if(item.nombre===nombre){
       validador= false;
     }
   });  
-    
+    //si no lo esta lo ingresa con los resultados en 0
   if (validador)
     {
       try{
@@ -253,16 +278,16 @@ export async function nuevoequipo(categoria, nombre, lista) {
 export async function nuevojugador(nombre, apellido, documento, equipo, lista) {
   
     let texto;
-    let jugadorid = uuidv4();
+    let jugadorid = uuidv4(); //elige un uid automatico
     let validador = true;
-  
+  // detecta si el jugador ya esta en la lista por el dni
     lista.forEach((item)=>{
     
       if(item.documento===documento){
         validador= false;
       }
     });  
-      
+      //si no lo esta lo agrega con los datos de goles y tarjetas en 0
     if (validador)
       {
         try{
