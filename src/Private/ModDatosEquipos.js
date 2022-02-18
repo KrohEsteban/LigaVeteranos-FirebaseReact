@@ -6,6 +6,7 @@ import { Alert, Button, Form, Table } from "react-bootstrap";
 import { nuevoequipo, nuevojugador, useVerlistadoequipos, verlistadoequipos, verlistadojugadores} from "./FireBase.js";
 import CargarEquipos from "./CargarEquipos.js";
 import { collection, getFirestore, onSnapshot, query } from "firebase/firestore";
+import CargarJugadores from "./CargarJugadores.js";
 
 
 
@@ -38,8 +39,7 @@ return (
                         <Accordion.Item eventKey="2" >
                             <Accordion.Header> <h1>Agregar Jugadores</h1> </Accordion.Header>
                             <Accordion.Body >
-
-
+                                <CargarJugadores listaequipos={listaequipos} />
                             </Accordion.Body>
                         </Accordion.Item>
                         

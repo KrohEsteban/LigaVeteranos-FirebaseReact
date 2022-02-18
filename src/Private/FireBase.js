@@ -29,15 +29,14 @@ const firebaseConfig = {
 
 // Initialize Firebase
 initializeApp(firebaseConfig);
-
+const  auth = getAuth();
+const db = getFirestore();
 
 // iniciar sesion
 
 export async function login(username, password){
   
   let token = false;
-  
-  const  auth = await getAuth();
   
   await signInWithEmailAndPassword(auth, username, password)
   .then(() => {
@@ -59,7 +58,6 @@ export async function login(username, password){
 
 export async function salir(){
 
-  const auth = await getAuth();
   await signOut(auth).then(() => {
   // Sign-out successful.
 
@@ -73,8 +71,6 @@ export async function salir(){
 export function useLogeado() {
 
   const [token, setToken] = useState(0);
-
-  const auth = getAuth();
   
   useEffect(() => {
     
@@ -100,14 +96,12 @@ export function useLogeado() {
 }
 
 
-// Listado de Equipos
+// Listado de Equipos en tiempo real
 
 export function useVerlistadoequipos(coleccion) {
 
   
   const [listadoequipos, setListaquipos] = useState([]);
-
-  const db = getFirestore();
 
   console.log("Ingreso al servidor para pedir lista de equipos")
   
@@ -158,43 +152,62 @@ export function useVerlistadoequipos(coleccion) {
 }
 
 
-// listado de jugadores
+// listado de jugadores en tiempo real
 
-export async function verlistadojugadores(coleccion) {
-  
-  const db = await getFirestore();
+export function useVerlistadojugadores(coleccion) {
 
-  let listado = [];
   
-  const datos = await getDocs(collection(db, coleccion));
+  const [listajugadores, setListajugadores]= useState([]);
+
+  console.log("Ingreso al servidor para pedir lista de jugadores")
+  
+  useEffect(()=>{
     
-  
-    datos.docs.forEach((item)=>{
-      
-      let objeto = []
+    //funcion real time
+    onSnapshot(query(collection(db, coleccion)), (snapshot) => {
+        //ingresa cada ves que hay un cambio
+        let listado =[];
+        //hace for each para ordenar la lista
+        snapshot.forEach((item)=>{
+        
+          let objeto = []
 
-      objeto.id=item.id;
-      objeto.nombre = item.data().nombre;
-      objeto.apellido = item.data().apellido;
-      objeto.documento =item.data().documento
-      objeto.equipo =item.data().equipo
-      objeto.goles =item.data().goles
-      objeto.suspendido =item.data().suspendido
+          objeto.id=item.id;
+          objeto.nombre = item.data().nombre;
+          objeto.apellido = item.data().apellido;
+          objeto.documento =item.data().documento
+          objeto.equipo =item.data().equipo
+          objeto.goles =item.data().goles
+          objeto.suspendido =item.data().suspendido
+          
       
-  
-      listado.push(objeto);
+          listado.push(objeto);
+            
+        })
+        //si la lista que trajo es igual de largo que el estado entonces la cambia 
+        //si no no se hace render y espera al proximo llamado
+      if(listajugadores.length !== listado.length){
       
-    })
+        setListajugadores(listado)
+      }
+      
     
-  return listado;
+    
+    });
+
+  });
+  
+    
+      
+   
+  return listajugadores ;
 }
 
 
 // Agregar equipo
 
 export async function nuevoequipo(categoria, nombre, lista) {
-// Add a new document in collection "cities"
-  const db = await getFirestore();
+
   let texto;
   let equipoid = uuidv4();
   let validador = true;
@@ -237,10 +250,8 @@ export async function nuevoequipo(categoria, nombre, lista) {
 
 // Agregar jugadores
 
-export async function nuevojugador(nombre, apellido, documento, equipo) {
-  // Add a new document in collection "cities"
-    const db = await getFirestore();
-    const lista= await verlistadojugadores("jugadores")
+export async function nuevojugador(nombre, apellido, documento, equipo, lista) {
+  
     let texto;
     let jugadorid = uuidv4();
     let validador = true;
