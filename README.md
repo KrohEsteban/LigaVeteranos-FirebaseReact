@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# Proyecto abandonado
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este proyecto fue un inicio de la pagina de la liga de veteranos utilizando react y boostrap para la parte visual y firebase para el backend, pero el backend se cambio utilizando Strapi en su lugar.
 
 ## Available Scripts
 
